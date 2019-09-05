@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <script src="https://cdn.jsdelivr.net/npm/marked@0/lib/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+</head>
+<body>
+  <row id="header">
+    <a id="blogTitle" href="/" style="width: 100%;"></a>
+    <a href="https://www.github.com/u9u/minimal-blog-tutorial">GitHub</a>
+    <a href="mailto:u9uwen@gmail.com" title="u9uwen@gmail.com">Email</a>
+  </row>
+  <div id="content">loading...</div>
+</body>
+</html>
+
+<script>
+  blogTitle = "Uwen's Blog"
+  repoPath = 'u9u/minimal-blog-tutorial'
+  postPath = 'posts'
+  content = document.querySelector('#content')
+
+  document.querySelector('#blogTitle').innerText = blogTitle
+  if(location.search) renderPostContent()
+  else renderPostList()
+
+  function renderPostList (){
+    document.title = blogTitle
+    if(localStorage.postListHTML) content.innerHTML = localStorage.postListHTML
+    fetch(`https://api.github.com/repos/${repoPath}/contents/${postPath}`)
+      .then(a => a.json())
+      .then( posts => {
+        let rows = posts.map( ({name}) => {
+          let [year, month, day, ...rest] = name.split('-')
+          let date = year + '年' + month + '月' + day + '日'
+          let title = rest.join('-').slice(0, -3)
+          return `<row>
+            <a href="?${name}">${title}</a>
+            <date>${date}</date>
+          </row>`
+        })
+        content.innerHTML = `<postlist>${rows.reverse().join('')}</>`
+        localStorage.postListHTML = content.innerHTML
+      })
+  }
+  function renderPostContent() {
+    let name = decodeURIComponent(location.search.slice(1))
+    document.title = name + ' - ' + blogTitle
+    if (localStorage[name]) content.innerHTML = localStorage[name]
+    fetch(`https://raw.githubusercontent.com/${repoPath}/master/${postPath}/${name}`)
+      .then(r => r.text())
+      .then(md => content.innerHTML = localStorage[name] = marked(md))
+      .catch(error => renderPostList())
+  }
+</script>
+
+<style>
+  body {
+    max-width: 43em;
+    margin: .5em auto;
+    padding: 0 .5em;
+  }
+  row {
+    display: flex;
+  }
+  #header {
+    padding: .5em 1em;
+  }
+  #header a {
+    display: inline-block;
+    text-decoration: none;
+    padding: .5em;
+  }
+  #header, #content {
+    box-shadow: 0 0.175em 0.5em rgba(2, 8, 20, .1), 0 0.085em 0.175em rgba(2, 8, 20, .08);
+  }
+  #content {
+    margin: 1em 0;
+    padding: .5em 1em;
+  }
+  postlist row {
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8em .5em;
+    border-bottom: .5px solid #ddd;
+  }
+  postlist row:last-child {
+    border: none;
+  }
+  date {
+    color: #555;
+    white-space: nowrap;
+    font-size: .9em;
+  }
+  a[href^=mailto]:before {
+    content: ''
+  }
+</style>
