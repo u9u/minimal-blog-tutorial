@@ -1,2 +1,2 @@
-# minimal-blog-tutorial
- 从零实现一个最简单的博客
+
+[100行代码实现一个极简&快速&免费的博客](https://b.uwen.me/?2019-09-05-100%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E6%9E%81%E7%AE%80&%E5%BF%AB%E9%80%9F&%E5%85%8D%E8%B4%B9%E7%9A%84%E5%8D%9A%E5%AE%A2.md)
